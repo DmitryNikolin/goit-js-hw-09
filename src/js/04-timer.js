@@ -1,7 +1,9 @@
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import Notiflix from 'notiflix';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
-
+let timeInterval = null;
+let selectedTime = new Date();
 const options = {
   enableTime: true,
   time_24hr: true,
@@ -14,6 +16,7 @@ const options = {
     } else {
       refs.startBtn.disabled = false;
     }
+    selectedTime = selectedDates[0];
   },
 };
 
@@ -36,11 +39,17 @@ function onStart() {
   refs.startBtn.disabled = true;
   const startTime = dataPickr.selectedDates[0];
   //console.log('startTime',startTime);
-  setInterval(() => {
+  timeInterval = setInterval(() => {
     const currentTime = Date.now();
     //console.log('currentTime', currentTime);
-    const deltaTime = startTime - currentTime;
+    const deltaTime = selectedTime - currentTime;
     //console.log('deltaTime',deltaTime);
+    if (deltaTime <= 0) {
+        Notiflix.Notify.success('Success count!');
+        refs.startBtn.disabled = false;
+        clearInterval(timeInterval);
+        return;
+    }
     const time = convertMs(deltaTime);
 
     refs.days.textContent = time.days;
